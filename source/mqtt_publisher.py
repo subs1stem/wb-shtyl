@@ -1,5 +1,6 @@
-from settings import *
 from paho.mqtt.publish import multiple
+
+from settings import *
 
 
 def publish_meta(name: str, error: str):

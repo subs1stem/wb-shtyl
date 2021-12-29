@@ -64,9 +64,13 @@ CHANNELS = {
          'Type': 'text',
          'Units': None,
          'Order': 13},
-    # 'batteryTable':
-    #     {'OID': '1.3.6.1.4.1.34498.2.1.3.2',
-    #      'Type': 'text',
-    #      'Units': None,
-    #      'Order': 14},
+    'BatTable':
+        {'OID': '1.3.6.1.4.1.34498.2.1.3.2',
+         'Order': 14},
+    'RectTable':
+        {'OID': '1.3.6.1.4.1.34498.2.1.4.2',
+         'Order': 20},
+    'InvTable':
+        {'OID': '1.3.6.1.4.1.34498.2.1.5.2',
+         'Order': 50},
 }

@@ -1,8 +1,8 @@
 import time
 
-import snmp.v1.exceptions
 from snmp import Manager
 from snmp.exceptions import Timeout
+from snmp.v1.exceptions import NoSuchName
 
 from functions import *
 from mqtt_publisher import *
@@ -16,31 +16,41 @@ while True:
     host = SNMP_DEVICE_ADDRESS
     try:
         for key in CHANNELS:
-            oid = CHANNELS[key]['OID']
-            data_type = CHANNELS[key]['Type']
-            units = CHANNELS[key]['Units']
-            order = CHANNELS[key]['Order']
-            response = manager.get(host, oid)
-            for item in response:
-                value = eval(str(item.value))
-                if isinstance(value, bytes):
-                    value = decode_byte_value(key, value)
-                elif key == 'AC flag':
-                    value = not value
-                elif key == 'Uptime':
-                    value = get_uptime(value)
-                publish_control(data=value,
-                                name=key,
-                                data_type=data_type,
-                                units=units,
-                                error='',
-                                order=order,)
+            try:
+                oid = CHANNELS[key]['OID']
+                mqtt_order = CHANNELS[key]['Order']
+                if 'Table' in key:
+                    key = key.replace('Table', '')
+                    response = manager.walk(host, oid)
+                    table = read_snmp_table(response, key, mqtt_order)
+                    for name in table:
+                        mqtt_data = table[name]['Value']
+                        mqtt_type = table[name]['Type']
+                        mqtt_units = table[name]['Units']
+                        mqtt_order = table[name]['Order']
+                        publish_control(data=mqtt_data,
+                                        name=name,
+                                        data_type=mqtt_type,
+                                        units=mqtt_units,
+                                        error='',
+                                        order=mqtt_order)
+                else:
+                    mqtt_type = CHANNELS[key]['Type']
+                    mqtt_units = CHANNELS[key]['Units']
+                    response = manager.get(host, oid)
+                    value = transform_item(response[0], key)
+                    publish_control(data=value,
+                                    name=key,
+                                    data_type=mqtt_type,
+                                    units=mqtt_units,
+                                    error='',
+                                    order=mqtt_order)
+
+            except NoSuchName:
+                continue
 
     except Timeout as e:
-        print("Request for {} from host {} timed out".format(e, host))
-
-    except snmp.v1.exceptions.NoSuchName as e:
-        print("Request for {} from host {} timed out".format(e, host))
+        print("Request for {} timed out".format(e))
 
     finally:
         manager.close()
