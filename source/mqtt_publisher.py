@@ -1,4 +1,4 @@
-from paho.mqtt.publish import multiple
+from paho.mqtt.publish import single, multiple
 
 from settings import *
 
@@ -47,3 +47,12 @@ def publish_control(data,
     ]
 
     multiple(msgs, hostname=MQTT_BROKER_IP)
+
+
+def publish_error(name: str, retain: bool = True) -> None:
+    single(
+        topic='{}/controls/{}/meta/error'.format(ROOT_MQTT_TOPIC, name),
+        payload='r',
+        retain=retain,
+        hostname=MQTT_BROKER_IP,
+    )

@@ -9,6 +9,8 @@ from mqtt_publisher import *
 from settings import *
 from snmp_channels import CHANNELS
 
+FAIL_COUNT = 0
+
 publish_meta(DEVICE_NAME, '')
 
 while True:
@@ -49,9 +51,16 @@ while True:
             except NoSuchName:
                 continue
 
+        FAIL_COUNT = 0
+
     except Timeout as e:
+        FAIL_COUNT += 1
         print("Request for {} timed out".format(e))
 
     finally:
         manager.close()
+
+        if FAIL_COUNT > 2:
+            publish_error('Work status')
+
         time.sleep(POLLING_INTERVAL)
