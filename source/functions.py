@@ -21,10 +21,10 @@ def transform_item(item, key=''):
     value = eval(str(item.value))
     if isinstance(value, bytes):
         value = decode_byte_value(value)
-        if key == 'DC power':
+        if key == 'DC_power':
             value = float(value) * 1000
         return value
-    elif key == 'AC flag':
+    elif key == 'AC_flag':
         return not value
     elif key == 'Uptime':
         return get_uptime(value)
