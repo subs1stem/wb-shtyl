@@ -61,6 +61,6 @@ while True:
         manager.close()
 
         if FAIL_COUNT > 2:
-            publish_error('Work status')
+            publish_error('Work_status')
 
         time.sleep(POLLING_INTERVAL)

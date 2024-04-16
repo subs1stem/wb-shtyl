@@ -14,12 +14,12 @@ CHANNELS = {
          'Type': 'text',
          'Units': None,
          'Order': 3},
-    'AC flag':
+    'AC_flag':
         {'OID': '1.3.6.1.4.1.34498.2.1.1.1.7.0',
          'Type': 'alarm',
          'Units': None,
          'Order': 4},
-    'Work status':
+    'Work_status':
         {'OID': '1.3.6.1.4.1.34498.2.1.1.1.1.0',
          'Type': 'text',
          'Units': None,
@@ -44,12 +44,12 @@ CHANNELS = {
          'Type': 'temperature',
          'Units': None,
          'Order': 9},
-    'DC power':
+    'DC_power':
         {'OID': '1.3.6.1.4.1.34498.2.1.1.1.8.0',
          'Type': 'power',
          'Units': None,
          'Order': 10},
-    'DC load':
+    'DC_load':
         {'OID': '1.3.6.1.4.1.34498.2.1.1.1.9.0',
          'Type': 'value',
          'Units': '%',
