@@ -5,13 +5,14 @@ from snmp.exceptions import Timeout
 from snmp.v1.exceptions import NoSuchName
 
 from functions import *
-from mqtt_publisher import *
+from mqtt_publisher import MQTTPublisher
 from settings import *
 from snmp_channels import CHANNELS
 
 FAIL_COUNT = 0
 
-publish_meta(DEVICE_NAME, '')
+mqtt = MQTTPublisher(MQTT_BROKER_IP, ROOT_MQTT_TOPIC)
+mqtt.publish_meta(DEVICE_NAME)
 
 while True:
     manager = Manager(SNMP_COMMUNITY)
@@ -30,23 +31,23 @@ while True:
                         mqtt_type = table[name]['Type']
                         mqtt_units = table[name]['Units']
                         mqtt_order = table[name]['Order']
-                        publish_control(data=mqtt_data,
-                                        name=name,
-                                        data_type=mqtt_type,
-                                        units=mqtt_units,
-                                        error='',
-                                        order=mqtt_order)
+                        mqtt.publish_control(data=mqtt_data,
+                                             name=name,
+                                             data_type=mqtt_type,
+                                             units=mqtt_units,
+                                             error='',
+                                             order=mqtt_order)
                 else:
                     mqtt_type = CHANNELS[key]['Type']
                     mqtt_units = CHANNELS[key]['Units']
                     response = manager.get(host, oid)
                     value = transform_item(response[0], key)
-                    publish_control(data=value,
-                                    name=key,
-                                    data_type=mqtt_type,
-                                    units=mqtt_units,
-                                    error='',
-                                    order=mqtt_order)
+                    mqtt.publish_control(data=value,
+                                         name=key,
+                                         data_type=mqtt_type,
+                                         units=mqtt_units,
+                                         error='',
+                                         order=mqtt_order)
 
             except NoSuchName:
                 continue
@@ -61,6 +62,6 @@ while True:
         manager.close()
 
         if FAIL_COUNT > 2:
-            publish_error('Work_status')
+            mqtt.publish_error('Work_status')
 
         time.sleep(POLLING_INTERVAL)

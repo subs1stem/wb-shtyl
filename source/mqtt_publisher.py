@@ -1,58 +1,53 @@
-from paho.mqtt.publish import single, multiple
-
-from settings import *
+import paho.mqtt.client as mqtt
 
 
-def publish_meta(name: str, error: str):
-    msgs = [
-        {'topic': '{}/meta/name'.format(ROOT_MQTT_TOPIC),
-         'payload': name,
-         'retain': True},
+class MQTTPublisher:
+    def __init__(self, broker_ip: str, root_topic: str):
+        self.client = mqtt.Client()
+        self.broker_ip = broker_ip
+        self.root_topic = root_topic
+        self.client.connect(self.broker_ip)
 
-        {'topic': '{}/meta/error'.format(ROOT_MQTT_TOPIC),
-         'payload': error,
-         'retain': True},
-    ]
+    def __del__(self):
+        self.disconnect()
 
-    multiple(msgs, hostname=MQTT_BROKER_IP)
+    def publish_meta(self, name: str, error: str = '') -> None:
+        msgs = [
+            ('{}/meta/name'.format(self.root_topic), name, 1, True),
+            ('{}/meta/error'.format(self.root_topic), error, 1, True),
+        ]
+        self.publish_multiple(msgs)
 
+    def publish_control(
+            self,
+            data,
+            name: str,
+            data_type: str,
+            units: str,
+            error: str,
+            order=None,
+            retain=True,
+    ) -> None:
+        msgs = [
+            ('{}/controls/{}'.format(self.root_topic, name), data, 1, retain),
+            ('{}/controls/{}/meta/type'.format(self.root_topic, name), data_type, 1, retain),
+            ('{}/controls/{}/meta/units'.format(self.root_topic, name), units, 1, retain),
+            ('{}/controls/{}/meta/order'.format(self.root_topic, name), order, 1, retain),
+            ('{}/controls/{}/meta/error'.format(self.root_topic, name), error, 1, retain),
+        ]
+        self.publish_multiple(msgs)
 
-def publish_control(data,
-                    name: str,
-                    data_type: str,
-                    units: str,
-                    error: str,
-                    order=None,
-                    retain=True):
-    msgs = [
-        {'topic': '{}/controls/{}'.format(ROOT_MQTT_TOPIC, name),
-         'payload': data,
-         'retain': retain},
+    def publish_error(self, name: str, retain: bool = True) -> None:
+        self.client.publish(
+            '{}/controls/{}/meta/error'.format(self.root_topic, name),
+            'r',
+            retain=retain
+        )
 
-        {'topic': '{}/controls/{}/meta/type'.format(ROOT_MQTT_TOPIC, name),
-         'payload': data_type,
-         'retain': retain},
+    def publish_multiple(self, msgs) -> None:
+        for msg in msgs:
+            topic, payload, qos, retain = msg
+            self.client.publish(topic, payload, qos, retain)
 
-        {'topic': '{}/controls/{}/meta/units'.format(ROOT_MQTT_TOPIC, name),
-         'payload': units,
-         'retain': retain},
-
-        {'topic': '{}/controls/{}/meta/order'.format(ROOT_MQTT_TOPIC, name),
-         'payload': order,
-         'retain': retain},
-
-        {'topic': '{}/controls/{}/meta/error'.format(ROOT_MQTT_TOPIC, name),
-         'payload': error,
-         'retain': retain},
-    ]
-
-    multiple(msgs, hostname=MQTT_BROKER_IP)
-
-
-def publish_error(name: str, retain: bool = True) -> None:
-    single(
-        topic='{}/controls/{}/meta/error'.format(ROOT_MQTT_TOPIC, name),
-        payload='r',
-        retain=retain,
-        hostname=MQTT_BROKER_IP,
-    )
+    def disconnect(self) -> None:
+        self.client.disconnect()
