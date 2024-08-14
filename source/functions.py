@@ -25,7 +25,7 @@ def transform_item(item, key=''):
             value = float(value) * 1000
         return value
     elif key == 'AC_flag':
-        return not value
+        return 0 if value == 1 else 1
     elif key == 'Uptime':
         return get_uptime(value)
     return value

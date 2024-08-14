@@ -29,11 +29,11 @@ class MQTTPublisher:
             retain=True,
     ) -> None:
         msgs = [
-            ('{}/controls/{}'.format(self.root_topic, name), data, 1, retain),
-            ('{}/controls/{}/meta/type'.format(self.root_topic, name), data_type, 1, retain),
-            ('{}/controls/{}/meta/units'.format(self.root_topic, name), units, 1, retain),
-            ('{}/controls/{}/meta/order'.format(self.root_topic, name), order, 1, retain),
-            ('{}/controls/{}/meta/error'.format(self.root_topic, name), error, 1, retain),
+            ('{}/controls/{}'.format(self.root_topic, name), data, 0, retain),
+            ('{}/controls/{}/meta/type'.format(self.root_topic, name), data_type, 0, retain),
+            ('{}/controls/{}/meta/units'.format(self.root_topic, name), units, 0, retain),
+            ('{}/controls/{}/meta/order'.format(self.root_topic, name), order, 0, retain),
+            ('{}/controls/{}/meta/error'.format(self.root_topic, name), error, 0, retain),
         ]
         self.publish_multiple(msgs)
 
