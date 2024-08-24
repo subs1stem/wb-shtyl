@@ -4,8 +4,8 @@ After=network.target
 
 [Service]
 Type=simple
-WorkingDirectory=/mnt/data/etc/wb-shtyl
-ExecStart=/mnt/data/etc/wb-shtyl/venv/bin/python3 main.py
+WorkingDirectory=/opt/wb-shtyl
+ExecStart=/opt/wb-shtyl/venv/bin/python3 /opt/wb-shtyl/wb_shtyl/main.py
 Restart=always
 TimeoutSec=120
 
