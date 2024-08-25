@@ -5,7 +5,7 @@ from snmp.exceptions import Timeout
 from snmp.v1.exceptions import NoSuchName
 
 from functions import *
-from mqtt_publisher import MQTTPublisher
+from wb_shtyl.modules.mqtt.mqtt_publisher import MQTTPublisher
 from settings import *
 from snmp_channels import CHANNELS
 
