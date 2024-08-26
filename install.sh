@@ -1,21 +1,26 @@
 #!/bin/bash
-apt install python3-dev python3-venv
 
-echo 'Creating service...'
-cp -u -r service/wb-shtyl.service /etc/systemd/system/
+echo 'Installing Python and necessary packages...'
+apt update
+apt install -y python3-dev python3-venv python3-pip
+
+echo 'Creating systemd service symlink...'
+ln -s /opt/wb-shtyl/systemd/wb-shtyl.service /etc/systemd/system/wb-shtyl.service
 systemctl daemon-reload
 systemctl enable wb-shtyl.service
 
-cp -u -r source /mnt/data/etc/wb-shtyl && cd /mnt/data/etc/wb-shtyl || exit
+echo 'Setting up virtual environment...'
+python3 -m venv /opt/wb-shtyl/venv
+source /opt/wb-shtyl/venv/bin/activate
 
-echo 'Installing venv...'
-python3 -m venv venv
-source venv/bin/activate
-
-echo 'Installing requirements...'
-pip install -r requirements.txt
+echo 'Installing Python dependencies...'
+pip install -r /opt/wb-shtyl/requirements.txt
 deactivate
 
-echo '--------------------------------------------------------------------'
-echo 'Done. Edit the settings.py file at the path /mnt/data/etc/wb-shtyl.'
-echo 'Use "systemctl start wb-shtyl.service" for running module.'
+echo 'Copying .env.example to .env...'
+cp /opt/wb-shtyl/.env.example /opt/wb-shtyl/.env
+
+echo '---------------------------------------------------------------------------'
+echo 'Installation complete!'
+echo 'Please configure the .env file located at: /opt/wb-shtyl/.env'
+echo 'To start the wb-shtyl service, use: systemctl start wb-shtyl.service'

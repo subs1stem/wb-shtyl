@@ -1,19 +1,33 @@
 # wb-shtyl
 
-Module for integrating Shtyl UPS into Wiren Board controller
+Module for integrating the Shtyl UPS into the Wiren Board controller.
 
-## Installation
+## 🛠 Installation
 
-On Wiren Board controller:
+* **Step 1:** Clone the repository:
 
-```
-git clone https://github.com/subs1stem/wb-shtyl.git
-cd wb-shtyl
-chmod +x install.sh
-./install.sh
+```bash
+git clone https://github.com/subs1stem/wb-shtyl.git /opt/wb-shtyl
 ```
 
-## Usage
+* **Step 2:** Run the installation script:
 
-Edit the file at the path `/mnt/data/etc/wb-shtyl/settings.py` and use `systemctl start wb-shtyl.service` for running
-module
+```bash
+# Make the install.sh script executable
+chmod +x /opt/wb-shtyl/install.sh
+
+# Run the installation script
+/opt/wb-shtyl/install.sh
+```
+
+* **Step 3:** Configure the .env file:
+
+```bash
+nano /opt/wb-shtyl/.env
+```
+
+* **Step 4:** Start service:
+
+```bash
+systemctl start wb-shtyl.service
+```
