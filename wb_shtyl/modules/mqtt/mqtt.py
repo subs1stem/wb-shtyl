@@ -37,11 +37,7 @@ class MQTTClient:
         ])
 
     def publish_error(self, name: str, retain: bool = True) -> None:
-        self.client.publish(
-            '{}/controls/{}/meta/error'.format(self.root_topic, name),
-            'r',
-            retain=retain,
-        )
+        self.client.publish(f'{self.root_topic}/controls/{name}/meta/error', 'r', retain=retain)
 
     def publish_multiple(self, msgs) -> None:
         for topic, payload, qos, retain in msgs:

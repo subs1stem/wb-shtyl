@@ -40,34 +40,35 @@ def read_snmp_table(table, key, mqtt_order):
         number = str(item[0].name)[-2]
         snmp_value = str(item[0].value)
         value = transform_item(item[0])
+
         if 'A' in snmp_value:
-            mqtt_name = 'i{key}{number}'.format(key=key,
-                                                number=number)
+            mqtt_name = f'i{key}{number}'
             mqtt_type = 'value'
             mqtt_units = 'А'
         elif 'V' in snmp_value:
-            mqtt_name = 'v{key}{number}'.format(key=key,
-                                                number=number)
+            mqtt_name = f'v{key}{number}'
             mqtt_type = 'voltage'
             mqtt_units = None
         elif 'C' in snmp_value:
-            mqtt_name = 't{key}{number}'.format(key=key,
-                                                number=number)
+            mqtt_name = f't{key}{number}'
             mqtt_type = 'temperature'
             mqtt_units = None
         elif 'Hz' in snmp_value:
-            mqtt_name = 'freq{key}{number}'.format(key=key,
-                                                   number=number)
+            mqtt_name = f'freq{key}{number}'
             mqtt_type = 'value'
             mqtt_units = 'Гц'
         else:
-            mqtt_name = 'alarm{key}{number}'.format(key=key,
-                                                    number=number)
+            mqtt_name = f'alarm{key}{number}'
             mqtt_type = 'text'
             mqtt_units = None
-        result[mqtt_name] = {'Value': value,
-                             'Type': mqtt_type,
-                             'Units': mqtt_units,
-                             'Order': mqtt_order}
+
+        result[mqtt_name] = {
+            'Value': value,
+            'Type': mqtt_type,
+            'Units': mqtt_units,
+            'Order': mqtt_order,
+        }
+
         mqtt_order += 1
+
     return result

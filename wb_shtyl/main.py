@@ -1,22 +1,26 @@
 import time
+from os import getenv
 
+from dotenv import load_dotenv
 from snmp import Manager
 from snmp.exceptions import Timeout
 from snmp.v1.exceptions import NoSuchName
 
-from functions import *
-from wb_shtyl.modules.mqtt.mqtt_publisher import MQTTPublisher
-from settings import *
-from snmp_channels import CHANNELS
+from modules.mqtt.mqtt import MQTTClient
+from modules.snmp.channels import CHANNELS
+from modules.snmp.functions import *
+
+load_dotenv()
 
 FAIL_COUNT = 0
 
-mqtt = MQTTPublisher(MQTT_BROKER_IP, ROOT_MQTT_TOPIC)
-mqtt.publish_meta(DEVICE_NAME)
+mqtt = MQTTClient(getenv('MQTT_BROKER_HOST'), getenv('MQTT_ROOT_TOPIC'))
+mqtt.publish_meta(getenv('MQTT_DEVICE_NAME'))
 
 while True:
-    manager = Manager(SNMP_COMMUNITY)
-    host = SNMP_DEVICE_ADDRESS
+    manager = Manager(getenv('DEVICE_SNMP_COMMUNITY').encode())
+    host = getenv('DEVICE_SNMP_HOST')
+
     try:
         for key in CHANNELS:
             try:
@@ -56,7 +60,7 @@ while True:
 
     except Timeout as e:
         FAIL_COUNT += 1
-        print("Request for {} timed out".format(e))
+        print(f'Request for {e} timed out')
 
     finally:
         manager.close()
@@ -64,4 +68,4 @@ while True:
         if FAIL_COUNT > 2:
             mqtt.publish_error('Work_status')
 
-        time.sleep(POLLING_INTERVAL)
+        time.sleep(int(getenv('POLLING_INTERVAL')))
