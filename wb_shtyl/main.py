@@ -21,6 +21,8 @@ while True:
     manager = Manager(getenv('DEVICE_SNMP_COMMUNITY').encode())
     host = getenv('DEVICE_SNMP_HOST')
 
+    battery_is_discharging = False
+
     try:
         for key in CHANNELS:
             try:
@@ -35,6 +37,11 @@ while True:
                         mqtt_type = table[name]['Type']
                         mqtt_units = table[name]['Units']
                         mqtt_order = table[name]['Order']
+
+                        # Set iBat1 topic value to negative when battery is discharging
+                        if name == 'iBat1' and battery_is_discharging:
+                            mqtt_data = -abs(float(mqtt_data))
+
                         mqtt.publish_control(data=mqtt_data,
                                              name=name,
                                              data_type=mqtt_type,
@@ -46,6 +53,10 @@ while True:
                     mqtt_units = CHANNELS[key]['Units']
                     response = manager.get(host, oid)
                     value = transform_item(response[0], key)
+
+                    if key == 'Work_status' and value == 'Разряд батарей':
+                        battery_is_discharging = True
+
                     mqtt.publish_control(data=value,
                                          name=key,
                                          data_type=mqtt_type,
